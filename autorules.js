@@ -1,3 +1,17 @@
+/*
+ * 脚本名称：自动添加分流规则
+ * 脚本功能：根据访问域名自动添加对应分流规则
+ * 作者：Assistant
+ * 版本：1.0.0
+ */
+
+// Loon API 声明
+const $request = $request || undefined;
+const $response = $response || undefined;
+const $notification = $notification || undefined;
+const $persistentStore = $persistentStore || undefined;
+const $httpClient = $httpClient || undefined;
+
 // 自动添加分流规则脚本
 const REPO_URL = 'https://github.com/luestr/ShuntRules';
 
@@ -78,5 +92,9 @@ function addRuleForDomain(domain) {
 }
 
 // 脚本入口
-const domain = $request.hostname;
-addRuleForDomain(domain); 
+if (typeof $request !== 'undefined') {
+  const domain = $request.hostname;
+  addRuleForDomain(domain);
+} else {
+  $done({});
+} 
