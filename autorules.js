@@ -1,7 +1,5 @@
 // 自动添加分流规则脚本
 const REPO_URL = 'https://github.com/luestr/ShuntRules';
-const CONFIG_PATH = 'loon.conf';
-const RULE_CACHE = new Set();
 
 // 提取域名关键词
 function extractKeyword(domain) {
@@ -35,27 +33,36 @@ function parseRules(content) {
 }
 
 // 主函数
-async function addRuleForDomain(domain) {
-  try {
-    const keyword = extractKeyword(domain);
-    
-    // 检查规则是否已存在
-    if ($persistentStore.read(keyword)) {
-      console.log(`规则 ${keyword} 已存在,跳过添加`);
+function addRuleForDomain(domain) {
+  const keyword = extractKeyword(domain);
+  
+  // 检查规则是否已存在
+  const existingRule = $persistentStore.read(keyword);
+  if (existingRule) {
+    console.log(`规则 ${keyword} 已存在,跳过添加`);
+    $done({});
+    return;
+  }
+  
+  // 获取规则内容
+  $httpClient.get(`${REPO_URL}/raw/main/Loon/${keyword}.list`, function(error, response, data) {
+    if (error) {
+      console.log(`获取规则失败: ${error}`);
+      $done({});
       return;
     }
     
-    // 获取规则内容
-    const response = await $httpClient.get(`${REPO_URL}/raw/main/Loon/${keyword}.list`);
-    if (!response.body) {
+    if (!data) {
       console.log(`未找到域名 ${domain} 对应的规则`);
+      $done({});
       return;
     }
     
     // 解析规则
-    const rules = parseRules(response.body);
+    const rules = parseRules(data);
     if (rules.length === 0) {
       console.log(`规则内容为空`);
+      $done({});
       return;
     }
     
@@ -66,14 +73,10 @@ async function addRuleForDomain(domain) {
     // 通知用户
     $notification.post('规则更新', '', `成功添加 ${keyword} 规则组`);
     
-  } catch (err) {
-    console.log(`添加规则失败: ${err}`);
-  }
+    $done({});
+  });
 }
 
 // 脚本入口
-!(async () => {
-  const domain = $request.hostname;
-  await addRuleForDomain(domain);
-  $done({});
-})(); 
+const domain = $request.hostname;
+addRuleForDomain(domain); 
