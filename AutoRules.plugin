@@ -1,0 +1,12 @@
+#!name=自动下载分流规则
+#!desc=根据域名自动下载对应分流规则
+#!author=Assistant
+#!homepage=https://github.com/luestr/ShuntRules
+#!icon=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Available.png
+
+[Script]
+# 处理域名请求
+http-request ^https?:\/\/.* script-path=https://raw.githubusercontent.com/SCRIPT_PATH/autorules.js,tag=AutoRules
+
+[MITM]
+hostname = * 
