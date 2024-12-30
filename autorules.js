@@ -5,14 +5,6 @@
  * 版本：1.0.0
  */
 
-// Loon API 声明
-const $request = $request || undefined;
-const $response = $response || undefined;
-const $notification = $notification || undefined;
-const $persistentStore = $persistentStore || undefined;
-const $httpClient = $httpClient || undefined;
-
-// 自动添加分流规则脚本
 const REPO_URL = 'https://github.com/luestr/ShuntRules';
 
 // 提取域名关键词
@@ -92,9 +84,5 @@ function addRuleForDomain(domain) {
 }
 
 // 脚本入口
-if (typeof $request !== 'undefined') {
-  const domain = $request.hostname;
-  addRuleForDomain(domain);
-} else {
-  $done({});
-} 
+const domain = $request.hostname;
+addRuleForDomain(domain); 
